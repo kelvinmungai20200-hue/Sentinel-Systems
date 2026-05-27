@@ -16,7 +16,7 @@ class Scan(Base):
     email = Column(String, index=True)
     url = Column(String)
     score = Column(Integer)
-    details = Column(JSON)  # Inahifadhi matokeo yote ya Deep Inspection
+    details = Column(JSON)  
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class Payment(Base):
