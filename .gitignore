@@ -1,0 +1,14 @@
+# Secrets and Keys
+.env
+
+# Database (Don't upload user data)
+sentinel.db
+
+# Large Folders
+venv/
+__pycache__/
+reports/
+
+# OS files
+.DS_Store
+Thumbs.db
