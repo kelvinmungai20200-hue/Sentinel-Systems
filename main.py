@@ -274,39 +274,28 @@ def home(request: Request):
 # SIGNUP
 # =========================================================
 @app.post("/signup")
-def signup(
-    email: str = Form(...),
-    password: str = Form(...)
-):
+def signup(username: str = Form(...), email: str = Form(...), password: str = Form(...)):
 
-    db = SessionLocal()
+    existing_user = db.query(User).filter(User.email == email).first()
 
-    existing = (
-        db.query(User)
-        .filter_by(email=email)
-        .first()
-    )
+    if existing_user:
+        return RedirectResponse("/?err=userexists", status_code=303)
 
-    if existing:
+    # bcrypt limit fix
+    password = password[:72]
 
-        return RedirectResponse(
-            "/?err=exists",
-            status_code=303
-        )
+    hashed_password = pwd.hash(password)
 
-    user = User(
+    new_user = User(
+        username=username,
         email=email,
-        password=pwd.hash(password)
+        password=hashed_password
     )
 
-    db.add(user)
-
+    db.add(new_user)
     db.commit()
 
-    return RedirectResponse(
-        "/?auth=ready",
-        status_code=303
-    )
+    return RedirectResponse("/?msg=accountcreated", status_code=303)
 
 # =========================================================
 # LOGIN
