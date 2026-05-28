@@ -4,73 +4,205 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentinel Enterprise | SaaS Security Dashboard</title>
+
     <link rel="icon" type="image/png" href="/static/favicon.png">
-    
-    <!-- YOUR FIXED LINKS HERE -->
+
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <style> 
-        body { background: #050505; color: white; font-family: 'Inter', sans-serif; scroll-behavior: smooth; } 
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    >
+
+    <style>
+        body {
+            background: #050505;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
+
 <body class="bg-black">
-    <!-- Navbar -->
+
+    <!-- NAVBAR -->
     <nav class="p-6 flex justify-between border-b border-zinc-900 sticky top-0 bg-black/80 backdrop-blur-md z-50">
-        <div class="font-black text-xl text-cyan-400 italic">SENTINEL SYSTEMS</div>
+
+        <div class="font-black text-xl text-cyan-400 italic">
+            SENTINEL SYSTEMS
+        </div>
+
         <div class="flex items-center gap-6 text-[10px] uppercase font-bold tracking-widest">
-            <a href="#about" class="text-zinc-500 hover:text-white">About Platform</a>
+
+            <a href="#about" class="text-zinc-500 hover:text-white">
+                About Platform
+            </a>
+
             {% if USER %}
-            <span class="text-cyan-500 font-mono font-bold">{{ USER }}</span>
-            <a href="/logout" class="bg-red-900/20 text-red-500 px-3 py-1 border border-red-900/50 rounded-full">Logout</a>
+
+            <span class="text-cyan-500 font-mono font-bold">
+                {{ USER }}
+            </span>
+
+            <a
+                href="/logout"
+                class="bg-red-900/20 text-red-500 px-3 py-1 border border-red-900/50 rounded-full"
+            >
+                Logout
+            </a>
+
             {% else %}
-            <button onclick="document.getElementById('auth-hub').scrollIntoView()" class="bg-zinc-900 px-4 py-1 border border-zinc-800 rounded-full">Sign In</button>
+
+            <button
+                onclick="document.getElementById('auth-hub').scrollIntoView()"
+                class="bg-zinc-900 px-4 py-1 border border-zinc-800 rounded-full"
+            >
+                Sign In
+            </button>
+
             {% endif %}
         </div>
+
     </nav>
 
+    <!-- MAIN -->
     <div class="max-w-6xl mx-auto px-6 py-12 text-center">
-        <!-- Scanner Module -->
+
+        <!-- SCANNER -->
         <div class="py-24 bg-zinc-900/20 rounded-[4rem] border border-zinc-800 mb-12 shadow-2xl relative">
-            <div id="spinner" class="hidden absolute inset-0 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin w-32 h-32 m-auto"></div>
-            <h1 class="text-5xl font-black mb-4 uppercase tracking-tighter">Deep <span class="text-cyan-400">Forensics</span></h1>
-            <p class="text-zinc-500 mb-12 text-xs uppercase tracking-[0.4em]">Audit Headers, SQLi Threats & SSL Status</p>
-            
+
+            <!-- LOADING SPINNER -->
+            <div
+                id="spinner"
+                class="hidden absolute inset-0 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin w-32 h-32 m-auto"
+            ></div>
+
+            <h1 class="text-5xl font-black mb-4 uppercase tracking-tighter">
+                Deep
+                <span class="text-cyan-400">
+                    Forensics
+                </span>
+            </h1>
+
+            <p class="text-zinc-500 mb-12 text-xs uppercase tracking-[0.4em]">
+                Audit Headers, SQLi Threats & SSL Status
+            </p>
+
+            <!-- URL INPUT -->
             <div class="flex bg-black border border-zinc-800 p-2 rounded-full w-full max-w-xl mx-auto mb-10 shadow-lg">
-                <input type="text" id="url" placeholder="https://target-node.com" class="flex-1 bg-transparent px-6 outline-none text-sm font-mono text-cyan-400">
-                <button onclick="runAudit()" class="bg-cyan-500 text-black font-black px-10 py-3 rounded-full uppercase text-xs">Inspect</button>
+
+                <input
+                    type="text"
+                    id="url"
+                    placeholder="https://target-node.com"
+                    class="flex-1 bg-transparent px-6 outline-none text-sm font-mono text-cyan-400"
+                >
+
+                <button
+                    onclick="runAudit()"
+                    class="bg-cyan-500 text-black font-black px-10 py-3 rounded-full uppercase text-xs"
+                >
+                    Inspect
+                </button>
+
             </div>
 
-            <!-- Dashboard Results -->
-            <div id="results" class="hidden grid grid-cols-1 md:grid-cols-3 gap-8 px-10">
+            <!-- RESULTS -->
+            <div
+                id="results"
+                class="hidden grid grid-cols-1 md:grid-cols-3 gap-8 px-10"
+            >
+
+                <!-- SCORE -->
                 <div class="bg-black/50 p-10 rounded-[3rem] border border-zinc-800 flex flex-col items-center">
+
                     <canvas id="scoreChart" width="140" height="140"></canvas>
-                    <h2 id="score-val" class="text-4xl font-mono font-bold mt-4">0%</h2>
+
+                    <h2
+                        id="score-val"
+                        class="text-4xl font-mono font-bold mt-4"
+                    >
+                        0%
+                    </h2>
+
                 </div>
+
+                <!-- DETAILS -->
                 <div class="md:col-span-2 bg-black/50 p-10 rounded-[3rem] border border-zinc-800 text-left">
-                    <h3 class="text-zinc-500 text-[10px] uppercase font-bold mb-4">Cyber Threat Vector Metrics</h3>
-                    <div id="tech-details" class="space-y-2 font-mono text-xs text-zinc-400 uppercase"></div>
-                    
-                    <div id="pay-zone" class="mt-8 p-4 bg-zinc-900 border border-zinc-800 rounded-2xl">
-                        <p class="text-[10px] text-zinc-500 mb-3 font-bold uppercase">Unlock Exportable Evidence Log PDF</p>
-                        <form action="/pay-mpesa" method="POST" class="flex flex-col md:flex-row gap-4">
+
+                    <h3 class="text-zinc-500 text-[10px] uppercase font-bold mb-4">
+                        Cyber Threat Vector Metrics
+                    </h3>
+
+                    <div
+                        id="tech-details"
+                        class="space-y-2 font-mono text-xs text-zinc-400 uppercase"
+                    ></div>
+
+                    <!-- MPESA -->
+                    <div
+                        id="pay-zone"
+                        class="mt-8 p-4 bg-zinc-900 border border-zinc-800 rounded-2xl"
+                    >
+
+                        <p class="text-[10px] text-zinc-500 mb-3 font-bold uppercase">
+                            Unlock Exportable Evidence Log PDF
+                        </p>
+
+                        <form
+                            action="/pay-mpesa"
+                            method="POST"
+                            class="flex flex-col md:flex-row gap-4"
+                        >
+
                             <input type="hidden" name="url" id="mp-url">
                             <input type="hidden" name="score" id="mp-score">
-                            <input type="text" name="phone" placeholder="07XXXXXXXX / 01XXXXXXXX" class="bg-black border border-zinc-700 p-3 rounded-xl flex-1 text-white outline-none text-xs" required>
-                            <button type="submit" class="bg-green-600 text-white font-black px-6 py-3 rounded-xl text-xs hover:bg-green-500 uppercase font-mono">Pay M-Pesa</button>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                placeholder="07XXXXXXXX / 01XXXXXXXX"
+                                class="bg-black border border-zinc-700 p-3 rounded-xl flex-1 text-white outline-none text-xs"
+                                required
+                            >
+
+                            <button
+                                type="submit"
+                                class="bg-green-600 text-white font-black px-6 py-3 rounded-xl text-xs hover:bg-green-500 uppercase font-mono"
+                            >
+                                Pay M-Pesa
+                            </button>
+
                         </form>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
-        <!-- HISTORICAL SCANS -->
+        <!-- HISTORY -->
         {% if USER and HISTORY %}
+
         <div class="bg-zinc-900/30 border border-zinc-800 rounded-[2rem] p-8 text-left mb-12">
-            <h3 class="text-cyan-400 font-bold uppercase text-xs tracking-widest mb-6"><i class="fas fa-history mr-2"></i> Historical Scans (Database Log)</h3>
+
+            <h3 class="text-cyan-400 font-bold uppercase text-xs tracking-widest mb-6">
+                <i class="fas fa-history mr-2"></i>
+                Historical Scans
+            </h3>
+
             <div class="overflow-x-auto font-mono text-xs">
+
                 <table class="w-full text-zinc-400">
+
                     <thead>
                         <tr class="border-b border-zinc-800 text-zinc-500 uppercase text-[10px]">
                             <th class="pb-3 text-left">Target Domain</th>
@@ -78,107 +210,347 @@
                             <th class="pb-3 text-right">Timestamp</th>
                         </tr>
                     </thead>
+
                     <tbody>
+
                         {% for scan in HISTORY %}
+
                         <tr class="border-b border-zinc-900/50 hover:bg-white/5">
-                            <td class="py-3 text-cyan-400">{{ scan.url }}</td>
-                            <td class="py-3 text-center font-bold text-white">{{ scan.score }}%</td>
-                            <td class="py-3 text-right text-zinc-600 font-mono">{{ scan.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+
+                            <td class="py-3 text-cyan-400">
+                                {{ scan.url }}
+                            </td>
+
+                            <td class="py-3 text-center font-bold text-white">
+                                {{ scan.score }}%
+                            </td>
+
+                            <td class="py-3 text-right text-zinc-600 font-mono">
+                                {{ scan.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            </td>
+
                         </tr>
+
                         {% endfor %}
+
                     </tbody>
+
                 </table>
+
             </div>
+
         </div>
+
         {% endif %}
 
         <!-- AUTH HUB -->
         {% if not USER %}
-        <div id="auth-hub" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto py-12 border-t border-zinc-900">
+
+        <div
+            id="auth-hub"
+            class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto py-12 border-t border-zinc-900"
+        >
+
+            <!-- LOGIN -->
             <div class="bg-zinc-900/40 p-8 rounded-[2rem] border border-zinc-800 text-left">
-                <h3 class="text-xs font-bold uppercase text-cyan-400 mb-4 tracking-widest">Authorize Access</h3>
+
+                <h3 class="text-xs font-bold uppercase text-cyan-400 mb-4 tracking-widest">
+                    Authorize Access
+                </h3>
+
                 <form action="/login" method="POST" class="space-y-4">
-                    <input name="email" type="email" placeholder="Email" class="w-full p-3 bg-black border border-zinc-800 rounded-xl outline-none text-xs" required>
-                    <input name="password" type="password" placeholder="Password" class="w-full p-3 bg-black border border-zinc-800 rounded-xl outline-none text-xs" required>
-                    <button class="w-full bg-cyan-500 text-black font-black p-3 rounded-xl text-xs uppercase">Login Profile</button>
+
+                    <input
+                        name="email"
+                        type="email"
+                        placeholder="Email"
+                        class="w-full p-3 bg-black border border-zinc-800 rounded-xl outline-none text-xs"
+                        required
+                    >
+
+                    <input
+                        name="password"
+                        type="password"
+                        placeholder="Password"
+                        class="w-full p-3 bg-black border border-zinc-800 rounded-xl outline-none text-xs"
+                        required
+                    >
+
+                    <button
+                        class="w-full bg-cyan-500 text-black font-black p-3 rounded-xl text-xs uppercase"
+                    >
+                        Login Profile
+                    </button>
+
                 </form>
+
             </div>
+
+            <!-- SIGNUP -->
             <div class="bg-zinc-900/40 p-8 rounded-[2rem] border border-zinc-800 text-left">
-                <h3 class="text-xs font-bold uppercase text-white mb-4 tracking-widest">Register Profile</h3>
+
+                <h3 class="text-xs font-bold uppercase text-white mb-4 tracking-widest">
+                    Register Profile
+                </h3>
+
                 <form action="/signup" method="POST" class="space-y-4">
-                    <input name="email" type="email" placeholder="Email" class="w-full p-3 bg-black border border-zinc-800 rounded-xl outline-none text-xs" required>
-                    <input name="password" type="password" placeholder="Password" class="w-full p-3 bg-black border border-zinc-800 rounded-xl outline-none text-xs" required>
-                    <button class="w-full bg-white text-black font-black p-3 rounded-xl text-xs uppercase">Sign Up</button>
+
+                    <!-- FIXED USERNAME FIELD -->
+                    <input
+                        name="username"
+                        type="text"
+                        placeholder="Username"
+                        class="w-full p-3 bg-black border border-zinc-800 rounded-xl outline-none text-xs"
+                        required
+                    >
+
+                    <input
+                        name="email"
+                        type="email"
+                        placeholder="Email"
+                        class="w-full p-3 bg-black border border-zinc-800 rounded-xl outline-none text-xs"
+                        required
+                    >
+
+                    <input
+                        name="password"
+                        type="password"
+                        placeholder="Password"
+                        class="w-full p-3 bg-black border border-zinc-800 rounded-xl outline-none text-xs"
+                        required
+                    >
+
+                    <button
+                        class="w-full bg-white text-black font-black p-3 rounded-xl text-xs uppercase"
+                    >
+                        Sign Up
+                    </button>
+
                 </form>
+
             </div>
+
         </div>
+
         {% endif %}
 
-        <section id="about" class="py-24 border-t border-zinc-900 text-left">
-            <h2 class="text-3xl font-black mb-4 uppercase">Advanced Forensics</h2>
-            <p class="text-zinc-500 text-sm italic leading-relaxed">Sentinel Enterprise handles vulnerability audits, parameters verification, and SSL status queries autonomously to safe-keep modern infrastructure layers.</p>
+        <!-- ABOUT -->
+        <section
+            id="about"
+            class="py-24 border-t border-zinc-900 text-left"
+        >
+
+            <h2 class="text-3xl font-black mb-4 uppercase">
+                Advanced Forensics
+            </h2>
+
+            <p class="text-zinc-500 text-sm italic leading-relaxed">
+                Sentinel Enterprise handles vulnerability audits,
+                parameters verification, and SSL status queries
+                autonomously to safe-keep modern infrastructure layers.
+            </p>
+
         </section>
 
-        <!-- FOOTER WITH SOCIALS -->
+        <!-- FOOTER -->
         <footer class="border-t border-zinc-900 py-16 text-left">
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
                 <div>
-                    <h4 class="text-white text-xs font-bold uppercase mb-6 tracking-widest text-cyan-400">Follow Our Mission</h4>
+
+                    <h4 class="text-white text-xs font-bold uppercase mb-6 tracking-widest text-cyan-400">
+                        Follow Our Mission
+                    </h4>
+
                     <div class="flex gap-6 text-2xl text-zinc-600">
-                        <a href="https://facebook.com" target="_blank" class="hover:text-blue-600 transition-colors"><i class="fab fa-facebook"></i></a>
-                        <a href="https://twitter.com" target="_blank" class="hover:text-cyan-400 transition-colors"><i class="fab fa-twitter"></i></a>
-                        <a href="https://whatsapp.com" target="_blank" class="hover:text-green-500 transition-colors"><i class="fab fa-whatsapp"></i></a>
-                        <a href="https://instagram.com" target="_blank" class="hover:text-pink-600 transition-colors"><i class="fab fa-instagram"></i></a>
-                        <a href="https://tiktok.com" target="_blank" class="hover:text-white transition-colors"><i class="fab fa-tiktok"></i></a>
+
+                        <a href="https://facebook.com" target="_blank" class="hover:text-blue-600 transition-colors">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+
+                        <a href="https://twitter.com" target="_blank" class="hover:text-cyan-400 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+
+                        <a href="https://whatsapp.com" target="_blank" class="hover:text-green-500 transition-colors">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+
+                        <a href="https://instagram.com" target="_blank" class="hover:text-pink-600 transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+
+                        <a href="https://tiktok.com" target="_blank" class="hover:text-white transition-colors">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+
                     </div>
+
                 </div>
-                <div class="md:text-right text-[8px] font-mono tracking-[0.5em] text-zinc-800 pt-6">© 2026 SENTINEL ENTERPRISE. ENCRYPTED.</div>
+
+                <div class="md:text-right text-[8px] font-mono tracking-[0.5em] text-zinc-800 pt-6">
+                    © 2026 SENTINEL ENTERPRISE. ENCRYPTED.
+                </div>
+
             </div>
+
         </footer>
+
     </div>
 
+    <!-- JAVASCRIPT -->
     <script>
-        let myChart;
-        async function runAudit() {
-            let urlInput = document.getElementById("url").value; if(!urlInput) return alert("URL Required.");
-            document.getElementById('spinner').classList.remove('hidden');
-            let res = await fetch("/scan?url=" + urlInput);
-            let data = await res.json();
-            
-            setTimeout(() => {
-                document.getElementById('spinner').classList.add('hidden');
-                if(data.error) { 
-                    alert(data.error); 
-                    if(data.error === "Login required") document.getElementById('auth-hub').scrollIntoView();
-                    return; 
-                }
-                
-                document.getElementById('results').classList.remove('hidden');
-                document.getElementById('score-val').innerText = data.score + "%";
-                
-                document.getElementById('mp-url').value = urlInput;
-                document.getElementById('mp-score').value = data.score;
-                
-                let html = `<p class='text-cyan-400 font-bold'>SERVER ENGINE: ${data.tech}</p>`;
-                html += `<p class='text-white font-bold'>SSL LOG: ${data.ssl} (${data.ssl_days_left})</p>`;
-                html += `<p class='text-zinc-400'>INTEGRITY LOG: ${data.headers}</p>`;
-                if(data.missing_headers.length > 0) {
-                    html += `<p class='text-amber-400 font-bold mt-4'>MISSING SECURITY HEADERS:</p>`;
-                    data.missing_headers.forEach(h => { html += `<p class='text-amber-500 text-[11px] pl-4'>• ${h}</p>`; });
-                }
-                if(data.vulnerabilities.length > 0) {
-                    html += `<p class='text-red-400 font-bold mt-4'>VULNERABILITIES FOUND:</p>`;
-                    data.vulnerabilities.forEach(v => { html += `<p class='text-red-500 text-[10px]'>• ${v}</p>`; });
-                }
-                document.getElementById('tech-details').innerHTML = html;
 
-                if(myChart) myChart.destroy();
-                myChart = new Chart(document.getElementById('scoreChart').getContext('2d'), {
-                    type: 'doughnut', data: { datasets: [{ data: [data.score, 100 - data.score], backgroundColor: ['#22d3ee', '#141414'], borderWidth: 0 }] },
-                    options: { cutout: '82%', events: [] }
-                });
+        let myChart;
+
+        async function runAudit() {
+
+            let urlInput = document.getElementById("url").value;
+
+            if (!urlInput) {
+                return alert("URL Required.");
+            }
+
+            document
+                .getElementById('spinner')
+                .classList.remove('hidden');
+
+            let res = await fetch("/scan?url=" + urlInput);
+
+            let data = await res.json();
+
+            setTimeout(() => {
+
+                document
+                    .getElementById('spinner')
+                    .classList.add('hidden');
+
+                if (data.error) {
+
+                    alert(data.error);
+
+                    if (data.error === "Login required") {
+                        document
+                            .getElementById('auth-hub')
+                            .scrollIntoView();
+                    }
+
+                    return;
+                }
+
+                document
+                    .getElementById('results')
+                    .classList.remove('hidden');
+
+                document
+                    .getElementById('score-val')
+                    .innerText = data.score + "%";
+
+                document
+                    .getElementById('mp-url')
+                    .value = urlInput;
+
+                document
+                    .getElementById('mp-score')
+                    .value = data.score;
+
+                let html = `
+                    <p class='text-cyan-400 font-bold'>
+                        SERVER ENGINE: ${data.tech}
+                    </p>
+                `;
+
+                html += `
+                    <p class='text-white font-bold'>
+                        SSL LOG: ${data.ssl}
+                        (${data.ssl_days_left})
+                    </p>
+                `;
+
+                html += `
+                    <p class='text-zinc-400'>
+                        INTEGRITY LOG: ${data.headers}
+                    </p>
+                `;
+
+                if (data.missing_headers.length > 0) {
+
+                    html += `
+                        <p class='text-amber-400 font-bold mt-4'>
+                            MISSING SECURITY HEADERS:
+                        </p>
+                    `;
+
+                    data.missing_headers.forEach(h => {
+
+                        html += `
+                            <p class='text-amber-500 text-[11px] pl-4'>
+                                • ${h}
+                            </p>
+                        `;
+
+                    });
+                }
+
+                if (data.vulnerabilities.length > 0) {
+
+                    html += `
+                        <p class='text-red-400 font-bold mt-4'>
+                            VULNERABILITIES FOUND:
+                        </p>
+                    `;
+
+                    data.vulnerabilities.forEach(v => {
+
+                        html += `
+                            <p class='text-red-500 text-[10px]'>
+                                • ${v}
+                            </p>
+                        `;
+
+                    });
+                }
+
+                document
+                    .getElementById('tech-details')
+                    .innerHTML = html;
+
+                if (myChart) {
+                    myChart.destroy();
+                }
+
+                myChart = new Chart(
+                    document
+                        .getElementById('scoreChart')
+                        .getContext('2d'),
+                    {
+                        type: 'doughnut',
+                        data: {
+                            datasets: [{
+                                data: [
+                                    data.score,
+                                    100 - data.score
+                                ],
+                                backgroundColor: [
+                                    '#22d3ee',
+                                    '#141414'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            cutout: '82%',
+                            events: []
+                        }
+                    }
+                );
+
             }, 1500);
+
         }
+
     </script>
+
 </body>
 </html>
